@@ -7,6 +7,8 @@ pub const INPUT_REGISTER: usize = 0xFFF0; // Memory-mapped input register
 pub const OUTPUT_REGISTER: usize = 0xFFF1; // Memory-mapped output register
 pub const RANDOM_REGISTER: usize = 0xFFF2; // Memory-mapped random number generator
 pub const TIMER_REGISTER: usize = 0xFFF3; // Memory-mapped timer register
+pub const VBLANK_FLAG: usize = 0xFFF4;
+pub const SAFE_TO_DRAW_FLAG: usize = 0xFFF5;
 
 // In vm.rs
 pub const INPUT_UP: u8 = 10;
@@ -270,14 +272,14 @@ impl VM {
         // 4. Trigger any VBlank-specific interrupts
         // In a more complex system, you might have interrupt vectors
         // For now, we'll just set a flag that could be checked by the program
-        self.memory[0xFFF4] = 1; // Set a VBlank flag at address 0xFFF4
+        self.memory[VBLANK_FLAG] = 1; // Set a VBlank flag at address 0xFFF4
 
         // 5. Signal that it's safe to update the screen
         // This is what we're using the screen_dirty flag for
         if self.screen_dirty {
             // In a real system, you might set a flag that the program can check
             // to know it's safe to update the screen
-            self.memory[0xFFF5] = 1; // Set a "safe to draw" flag at address 0xFFF5
+            self.memory[SAFE_TO_DRAW_FLAG] = 1; // Set a "safe to draw" flag at address 0xFFF5
         }
 
         // 6. Reset the screen_dirty flag
