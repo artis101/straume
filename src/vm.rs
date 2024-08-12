@@ -62,6 +62,8 @@ pub struct VM {
     call_stack: Vec<usize>,
     pub halted: bool,
     timer: u64,
+    pub screen_dirty: bool,
+    input_state: u8,
 }
 
 impl VM {
@@ -74,6 +76,8 @@ impl VM {
             call_stack: Vec::new(),
             halted: false,
             timer: 0,
+            screen_dirty: false,
+            input_state: INPUT_NONE,
         }
     }
 
@@ -212,10 +216,7 @@ impl VM {
 
     pub fn read_memory(&self, addr: usize) -> u8 {
         match addr {
-            INPUT_REGISTER => {
-                // In a real emulator, you'd read input from the emulator's input system
-                0 // Placeholder
-            }
+            INPUT_REGISTER => self.input_state,
             RANDOM_REGISTER => self.memory[RANDOM_REGISTER],
             TIMER_REGISTER => self.timer as u8,
             _ => self.memory[addr],
@@ -225,12 +226,11 @@ impl VM {
     pub fn write_memory(&mut self, addr: usize, value: u8) {
         match addr {
             OUTPUT_REGISTER => {
-                // In a real emulator, you'd send this to the emulator's output system
                 println!("Output: {}", value as char);
             }
             addr if (VRAM_START..VRAM_START + VRAM_SIZE).contains(&addr) => {
                 self.memory[addr] = value;
-                // In a real emulator, you'd trigger a screen update here
+                self.screen_dirty = true;
             }
             _ => self.memory[addr] = value,
         }
@@ -242,7 +242,48 @@ impl VM {
         }
     }
 
-    pub fn set_input(&mut self, value: u8) {
-        self.memory[INPUT_REGISTER] = value;
+    pub fn set_input(&mut self, input: u8) {
+        self.input_state = input;
+    }
+
+    pub fn check_input(&self) -> u8 {
+        self.input_state
+    }
+
+    pub fn vblank_interrupt(&mut self) {
+        // Simulate the vertical blanking interval
+
+        // 1. Update timers
+        // In many systems, timers are updated during VBlank
+        if self.timer > 0 {
+            self.timer -= 1;
+        }
+
+        // 2. Handle sound
+        // If you implement sound, you might update sound registers here
+
+        // 3. Update input
+        // Some systems read input during VBlank
+        // For now, we'll just ensure the input state is current
+        self.memory[INPUT_REGISTER] = self.input_state;
+
+        // 4. Trigger any VBlank-specific interrupts
+        // In a more complex system, you might have interrupt vectors
+        // For now, we'll just set a flag that could be checked by the program
+        self.memory[0xFFF4] = 1; // Set a VBlank flag at address 0xFFF4
+
+        // 5. Signal that it's safe to update the screen
+        // This is what we're using the screen_dirty flag for
+        if self.screen_dirty {
+            // In a real system, you might set a flag that the program can check
+            // to know it's safe to update the screen
+            self.memory[0xFFF5] = 1; // Set a "safe to draw" flag at address 0xFFF5
+        }
+
+        // 6. Reset the screen_dirty flag
+        // This is done here rather than in the rendering code because
+        // in a real system, the VBlank period is when you know the screen
+        // isn't being actively drawn to
+        self.screen_dirty = false;
     }
 }

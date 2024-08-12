@@ -46,6 +46,7 @@ fn main() -> Result<(), String> {
     vm.load_program(sample_program);
 
     let mut last_update = Instant::now();
+    let mut frame_counter = 0;
 
     'running: loop {
         for event in event_pump.poll_iter() {
@@ -77,13 +78,23 @@ fn main() -> Result<(), String> {
             }
         }
 
-        canvas.set_draw_color(Color::RGB(0, 0, 0));
-        canvas.clear();
-        renderer.render(
-            &mut canvas,
-            &vm.memory[vm::VRAM_START..vm::VRAM_START + vm::VRAM_SIZE],
-        )?;
-        canvas.present();
+        // Simulate a VBlank interrupt every 60th of a second
+        frame_counter += 1;
+        if frame_counter % 60 == 0 {
+            vm.vblank_interrupt();
+        }
+
+        // Only render if the screen is dirty
+        if vm.screen_dirty {
+            canvas.set_draw_color(Color::RGB(0, 0, 0));
+            canvas.clear();
+            renderer.render(
+                &mut canvas,
+                &vm.memory[vm::VRAM_START..vm::VRAM_START + vm::VRAM_SIZE],
+            )?;
+            canvas.present();
+            vm.screen_dirty = false;
+        }
 
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
