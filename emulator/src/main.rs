@@ -26,18 +26,18 @@ fn main() -> Result<(), String> {
     let renderer = renderer::Renderer::new();
 
     let sample_program = vec![
-        vm::Instruction::LoadImmediate(vm::VRAM_START, 72), // 'H'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 1, 101), // 'e'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 2, 108), // 'l'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 3, 108), // 'l'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 4, 111), // 'o'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 5, 32), // ' '
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 6, 87), // 'W'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 7, 111), // 'o'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 8, 114), // 'r'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 9, 108), // 'l'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 10, 100), // 'd'
-        vm::Instruction::LoadImmediate(vm::VRAM_START + 11, 33), // '!'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START, 72), // 'H'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 1, 101), // 'e'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 2, 108), // 'l'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 3, 108), // 'l'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 4, 111), // 'o'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 5, 32), // ' '
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 6, 87), // 'W'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 7, 111), // 'o'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 8, 114), // 'r'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 9, 108), // 'l'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 10, 100), // 'd'
+        vm::Instruction::ImmediateToMemory(vm::VRAM_START + 11, 33), // '!'
         vm::Instruction::RandomNum(65, 90),                 // Random uppercase letter
         vm::Instruction::Load(vm::RANDOM_REGISTER),
         vm::Instruction::Store(vm::VRAM_START + 5),

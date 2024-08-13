@@ -10,7 +10,6 @@ pub const TIMER_REGISTER: usize = 0xFFF3; // Memory-mapped timer register
 pub const VBLANK_FLAG: usize = 0xFFF4;
 pub const SAFE_TO_DRAW_FLAG: usize = 0xFFF5;
 
-// In vm.rs
 pub const INPUT_UP: u8 = 10;
 pub const INPUT_DOWN: u8 = 20;
 pub const INPUT_LEFT: u8 = 30;
@@ -49,7 +48,7 @@ pub enum Instruction {
     Ret,
     Load(usize),
     Store(usize),
-    LoadImmediate(usize, i32),
+    ImmediateToMemory(usize, i32),
     RandomNum(i32, i32),
     Sleep(u64),
     ClearScreen,
@@ -170,7 +169,7 @@ impl VM {
                     self.write_memory(*addr, value as u8);
                 }
             }
-            Instruction::LoadImmediate(addr, value) => {
+            Instruction::ImmediateToMemory(addr, value) => {
                 self.write_memory(*addr, *value as u8);
             }
             Instruction::RandomNum(min, max) => {
